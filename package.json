@@ -4,6 +4,7 @@
   "private": true,
   "description": "Ambiente local do Arquivo Arrakis com WordPress, MCP e Codex CLI.",
   "scripts": {
+    "doctor": "node scripts/doctor.mjs",
     "env:start": "wp-env start",
     "env:stop": "wp-env stop",
     "env:destroy": "wp-env destroy",
