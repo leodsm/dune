@@ -1,5 +1,5 @@
 [mcp_servers.wordpress_local]
-command = "node"
-args = ["scripts/mcp-wordpress-local.mjs"]
+url = "http://localhost:8888/wp-json/mcp/mcp-adapter-default-server"
+env_http_headers = { Authorization = "ARRAKIS_MCP_AUTH" }
 startup_timeout_sec = 45
 tool_timeout_sec = 120
