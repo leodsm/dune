@@ -1,5 +1,6 @@
 node_modules/
 .wp-env/
+.arrakis-mcp.local
 .DS_Store
 *.log
 .env
