@@ -1,5 +1,5 @@
 [mcp_servers.wordpress_local]
-command = "bash"
-args = ["scripts/mcp-wordpress-local.sh"]
-startup_timeout_sec = 30
+command = "node"
+args = ["scripts/mcp-wordpress-local.mjs"]
+startup_timeout_sec = 45
 tool_timeout_sec = 120
