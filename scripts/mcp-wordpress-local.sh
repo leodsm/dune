@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # Project-local MCP launcher for Codex.
-# The WordPress site runs in wp-env. Codex talks to the official MCP Adapter
-# through Automattic's HTTP proxy, which keeps MCP stdout clean.
+# WordPress runs in wp-env. Codex talks to the official MCP Adapter
+# through Automattic's HTTP proxy so MCP stdout stays clean.
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CREDENTIAL_FILE="$ROOT_DIR/.arrakis-mcp.local"
@@ -34,20 +34,18 @@ create_local_credentials() {
   fi
 
   umask 077
-  cat > "$CREDENTIAL_FILE" <<EOF
-WP_API_URL=http://localhost:8888/wp-json/mcp/mcp-adapter-default-server
-WP_API_USERNAME=admin
-WP_API_PASSWORD=$password
-EOF
+  {
+    printf "export WP_API_URL='%s'\n" "http://localhost:8888/wp-json/mcp/mcp-adapter-default-server"
+    printf "export WP_API_USERNAME='%s'\n" "admin"
+    printf "export WP_API_PASSWORD='%s'\n" "$password"
+  } > "$CREDENTIAL_FILE"
 }
 
 if [ ! -f "$CREDENTIAL_FILE" ]; then
   create_local_credentials
 fi
 
-set -a
 # shellcheck disable=SC1090
 source "$CREDENTIAL_FILE"
-set +a
 
 exec npx -y @automattic/mcp-wordpress-remote@latest
