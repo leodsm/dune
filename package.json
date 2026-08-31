@@ -9,10 +9,10 @@
     "env:destroy": "wp-env destroy",
     "env:clean": "wp-env clean all",
     "wp": "wp-env run cli wp",
-    "wp:bootstrap": "wp-env run cli wp plugin activate mcp-adapter arrakis-core && wp-env run cli wp rewrite structure '/%postname%/' --hard && wp-env run cli wp rewrite flush --hard && wp-env run cli wp option update blogname 'Arquivo Arrakis'",
+    "wp:bootstrap": "wp-env run cli wp plugin activate mcp-adapter arrakis-core && wp-env run cli \"wp rewrite structure /%postname%/\" && wp-env run cli wp rewrite flush --hard && wp-env run cli wp option update blogname 'Arquivo Arrakis'",
     "wp:status": "wp-env run cli wp plugin status mcp-adapter && wp-env run cli wp plugin status arrakis-core",
-    "mcp:stdio": "bash scripts/mcp-wordpress-local.sh",
-    "mcp:check": "wp-env run cli wp mcp-adapter server list"
+    "mcp:start": "bash scripts/mcp-wordpress-local.sh",
+    "mcp:check": "wp-env run cli wp mcp-adapter list -- --format=json"
   },
   "devDependencies": {
     "@wordpress/env": "latest"
