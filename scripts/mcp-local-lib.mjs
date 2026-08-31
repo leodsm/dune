@@ -7,13 +7,12 @@ const here = dirname(fileURLToPath(import.meta.url));
 export const root = resolve(here, '..');
 export const endpoint = 'http://localhost:8888/wp-json/mcp/mcp-adapter-default-server';
 const credentialFile = resolve(root, '.arrakis-mcp.local');
-const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
 
 export function run(command, args, options = {}) {
   return spawnSync(command, args, {
     cwd: root,
     encoding: 'utf8',
-    shell: false,
+    shell: process.platform === 'win32',
     ...options,
   });
 }
@@ -25,20 +24,18 @@ export function fail(message, detail = '') {
 }
 
 export function checkLocalEnvironment() {
-  const docker = run(process.platform === 'win32' ? 'docker.exe' : 'docker', [
-    'version', '--format', '{{.Server.Version}}',
-  ]);
+  const docker = run('docker', ['version', '--format', '{{.Server.Version}}']);
   if (docker.error || docker.status !== 0) {
     fail('Docker Engine não está disponível. Abra o Docker Desktop.', docker.stderr || docker.stdout);
   }
 
-  const wpEnv = run(npx, ['wp-env', 'status']);
+  const wpEnv = run('npx', ['wp-env', 'status']);
   if (wpEnv.error || wpEnv.status !== 0) {
     fail('O wp-env não está ativo. Rode primeiro: npm run env:start', wpEnv.stderr || wpEnv.stdout);
   }
 
   for (const plugin of ['mcp-adapter', 'arrakis-core']) {
-    const status = run(npx, ['wp-env', 'run', 'cli', 'wp', 'plugin', 'status', plugin]);
+    const status = run('npx', ['wp-env', 'run', 'cli', 'wp', 'plugin', 'status', plugin]);
     const output = `${status.stdout || ''}\n${status.stderr || ''}`;
     if (status.status !== 0 || !/Status:\s+Active/i.test(output)) {
       fail(`O plugin ${plugin} não está ativo. Rode: npm run wp:bootstrap`, output);
@@ -60,7 +57,7 @@ function parseCredentialFile() {
 }
 
 function createCredentials() {
-  const result = run(npx, [
+  const result = run('npx', [
     'wp-env', 'run', 'cli', 'wp',
     'user', 'application-password', 'create',
     'admin', 'Arrakis-Codex-MCP', '--porcelain',
