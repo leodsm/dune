@@ -4,7 +4,6 @@ import { checkLocalEnvironment, getValidAuthorization, root } from './mcp-local-
 checkLocalEnvironment();
 const authorization = await getValidAuthorization();
 
-const command = process.platform === 'win32' ? 'codex.cmd' : 'codex';
 const env = {
   ...process.env,
   ARRAKIS_MCP_AUTH: authorization,
@@ -12,11 +11,11 @@ const env = {
 
 console.log('Arquivo Arrakis — abrindo Codex com autenticação MCP local...\n');
 
-const child = spawn(command, [], {
+const child = spawn('codex', [], {
   cwd: root,
   env,
   stdio: 'inherit',
-  shell: false,
+  shell: process.platform === 'win32',
 });
 
 child.on('error', (error) => {
