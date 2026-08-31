@@ -15,33 +15,52 @@ O projeto nasce pensando em SEO, distribuição social, retenção mobile e mone
 
 ## Stack inicial
 
-- WordPress (última versão estável suportada pelo `wp-env`)
+- WordPress
 - PHP 8.2
 - WordPress Abilities API
 - WordPress MCP Adapter oficial
 - Codex CLI + MCP
 - `@wordpress/env` para desenvolvimento local
+- Docker Desktop
 - GitHub como fonte de verdade do código
 
-## Início rápido
+## Windows
 
-Pré-requisitos recomendados no Windows:
+O projeto funciona diretamente no **PowerShell**. WSL2 continua recomendado como backend do Docker Desktop, mas você não precisa trabalhar dentro do terminal Linux para usar o projeto.
 
-- WSL2
+Pré-requisitos:
+
 - Docker Desktop com backend WSL2
 - Node.js LTS
 - Git
 - Codex CLI
 
-Depois:
+O `wp-env` usa Docker por padrão. O runtime experimental baseado em WordPress Playground não é usado neste projeto porque ele não oferece o comando `wp-env run`, necessário para nossas rotinas WP-CLI/MCP.
 
-```bash
+## Início rápido
+
+Depois de instalar e abrir o Docker Desktop:
+
+```powershell
 git clone https://github.com/leodsm/dune.git
 cd dune
 npm install
+npm run doctor
 npm run env:start
 npm run wp:bootstrap
+npm run mcp:check
 codex
+```
+
+Se o repositório já estiver clonado:
+
+```powershell
+git pull origin main
+npm install
+npm run doctor
+npm run env:start
+npm run wp:bootstrap
+npm run mcp:check
 ```
 
 Dentro do Codex, confirme o MCP com:
@@ -52,11 +71,21 @@ Dentro do Codex, confirme o MCP com:
 
 Ou no terminal:
 
-```bash
+```powershell
 codex mcp list
 ```
 
-O servidor MCP do projeto é configurado em `.codex/config.toml` e usa o WordPress local via WP-CLI/STDIO.
+O servidor MCP do projeto é configurado em `.codex/config.toml`. O launcher `scripts/mcp-wordpress-local.mjs` é cross-platform e cria automaticamente uma WordPress Application Password local na primeira conexão.
+
+## Diagnóstico
+
+Sempre que algo não iniciar, rode:
+
+```powershell
+npm run doctor
+```
+
+Ele verifica Node.js, npm, Git, Docker CLI, Docker Engine e `wp-env`.
 
 ## WordPress local
 
@@ -69,7 +98,7 @@ O servidor MCP do projeto é configurado em `.codex/config.toml` e usa o WordPre
 
 ## Primeiras Abilities MCP
 
-O plugin `arrakis-core` registra ferramentas para:
+O plugin `arrakis-core` registra Abilities para:
 
 - verificar o estado do projeto;
 - listar conteúdos;
@@ -89,7 +118,8 @@ As operações de escrita começam limitadas a **rascunhos**. Publicação autom
 │   ├── CONTENT-SYSTEM.md
 │   └── MCP-SETUP.md
 ├── scripts/
-│   └── mcp-wordpress-local.sh
+│   ├── doctor.mjs
+│   └── mcp-wordpress-local.mjs
 ├── wp-content/
 │   └── plugins/
 │       └── arrakis-core/
