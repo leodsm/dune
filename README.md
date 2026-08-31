@@ -15,31 +15,27 @@ O projeto nasce pensando em SEO, distribuição social, retenção mobile e mone
 
 ## Stack inicial
 
-- WordPress
+- WordPress local via `@wordpress/env`
 - PHP 8.2
 - WordPress Abilities API
 - WordPress MCP Adapter oficial
-- Codex CLI + MCP
-- `@wordpress/env` para desenvolvimento local
+- Codex CLI
+- MCP Streamable HTTP direto entre Codex e WordPress
 - Docker Desktop
 - GitHub como fonte de verdade do código
 
 ## Windows
 
-O projeto funciona diretamente no **PowerShell**. WSL2 continua recomendado como backend do Docker Desktop, mas você não precisa trabalhar dentro do terminal Linux para usar o projeto.
+O projeto funciona diretamente no **PowerShell**. WSL2 pode continuar como backend do Docker Desktop, mas você não precisa trabalhar dentro de um terminal Linux.
 
 Pré-requisitos:
 
-- Docker Desktop com backend WSL2
-- Node.js LTS
+- Docker Desktop com virtualização ativa
+- Node.js 22+
 - Git
 - Codex CLI
 
-O `wp-env` usa Docker por padrão. O runtime experimental baseado em WordPress Playground não é usado neste projeto porque ele não oferece o comando `wp-env run`, necessário para nossas rotinas WP-CLI/MCP.
-
 ## Início rápido
-
-Depois de instalar e abrir o Docker Desktop:
 
 ```powershell
 git clone https://github.com/leodsm/dune.git
@@ -49,7 +45,7 @@ npm run doctor
 npm run env:start
 npm run wp:bootstrap
 npm run mcp:check
-codex
+npm run codex
 ```
 
 Se o repositório já estiver clonado:
@@ -57,35 +53,27 @@ Se o repositório já estiver clonado:
 ```powershell
 git pull origin main
 npm install
-npm run doctor
-npm run env:start
-npm run wp:bootstrap
 npm run mcp:check
+npm run codex
 ```
 
-Dentro do Codex, confirme o MCP com:
+> Neste projeto, prefira `npm run codex` em vez de abrir `codex` diretamente. O launcher injeta somente na sessão atual o cabeçalho de autenticação necessário para o WordPress MCP local.
+
+Dentro do Codex:
 
 ```text
 /mcp
 ```
 
-Ou no terminal:
-
-```powershell
-codex mcp list
-```
-
-O servidor MCP do projeto é configurado em `.codex/config.toml`. O launcher `scripts/mcp-wordpress-local.mjs` é cross-platform e cria automaticamente uma WordPress Application Password local na primeira conexão.
+O servidor deve aparecer como `wordpress_local`.
 
 ## Diagnóstico
-
-Sempre que algo não iniciar, rode:
 
 ```powershell
 npm run doctor
 ```
 
-Ele verifica Node.js, npm, Git, Docker CLI, Docker Engine e `wp-env`.
+Verifica Node.js, npm, Git, Docker CLI, Docker Engine e `wp-env`.
 
 ## WordPress local
 
@@ -94,7 +82,28 @@ Ele verifica Node.js, npm, Git, Docker CLI, Docker Engine e `wp-env`.
 - Usuário padrão do wp-env: `admin`
 - Senha padrão do wp-env: `password`
 
-> Essas credenciais são somente do ambiente local descartável do `wp-env`. Nunca reutilize em produção.
+Essas credenciais são somente do ambiente local descartável do `wp-env`. Nunca reutilize em produção.
+
+## MCP local
+
+O MCP Adapter oficial expõe o servidor padrão em:
+
+```text
+http://localhost:8888/wp-json/mcp/mcp-adapter-default-server
+```
+
+O Codex se conecta diretamente por **Streamable HTTP**. Não há proxy MCP intermediário.
+
+`npm run mcp:check` faz um teste real de comunicação:
+
+1. verifica Docker e wp-env;
+2. confirma `mcp-adapter` e `arrakis-core` ativos;
+3. cria ou valida uma WordPress Application Password local;
+4. envia `initialize`;
+5. envia `notifications/initialized`;
+6. executa `tools/list`.
+
+A credencial local fica em `.arrakis-mcp.local`, ignorado pelo Git.
 
 ## Primeiras Abilities MCP
 
@@ -115,11 +124,11 @@ As operações de escrita começam limitadas a **rascunhos**. Publicação autom
 ├── .codex/
 │   └── config.toml
 ├── docs/
-│   ├── CONTENT-SYSTEM.md
-│   └── MCP-SETUP.md
 ├── scripts/
+│   ├── codex-arrakis.mjs
 │   ├── doctor.mjs
-│   └── mcp-wordpress-local.mjs
+│   ├── mcp-local-lib.mjs
+│   └── mcp-smoke.mjs
 ├── wp-content/
 │   └── plugins/
 │       └── arrakis-core/
